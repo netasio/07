@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Procesar Vector desde Archivo</title>
+</head>
+<body>
+  <h1>Procesar Vector desde Archivo</h1>
+  <input type="file" id="fileInput" />
+  <button id="processBtn" disabled>Procesar y Guardar</button>
+  <p id="output"></p>
+
+  <script>
+    let vector = [];
+
+    document.getElementById('fileInput').addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        vector = e.target.result.split(',').map(Number);
+        document.getElementById('output').textContent = `Vector cargado: [${vector.join(', ')}]`;
+        document.getElementById('processBtn').disabled = false;
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById('processBtn').addEventListener('click', function() {
+      if (vector.length === 0) return;
+
+       const results = vector.map(num => {
+        const numStr = num.toString();
+        return {
+          original: num,
+          firstChar: numStr[0],
+          lastChar: numStr[numStr.length - 1],
+        };
+      });
+
+      let outputContent = 'Resultados:\n';
+      results.forEach(res => {
+        outputContent += `Número: ${res.original}, Primera posición: ${res.firstChar}, Última posición: ${res.lastChar}\n`;
+      });
+
+      const blob = new Blob([outputContent], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'output.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</body>
+</html>
